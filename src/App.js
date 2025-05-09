@@ -6,24 +6,24 @@ import './App.css';
 const App = () => {
   return (
     <>
+    <div className="background">
+      <div className="content">
       <Navbar className="navbar">
         <Container className="contNavBar">
           <Navbar.Brand as={Link} to='/'>
             Zelda Compendium
           </Navbar.Brand>
-          <Nav className="links">
             <Nav.Link as={Link} to='/personagens'>
               Personagens
             </Nav.Link>
-            <Nav.Link as={Link} to='/monstros'>
-              Monstros
-            </Nav.Link>
-          </Nav>
         </Container>
       </Navbar>
       <Container>
         <Routes />
       </Container>
+      </div>
+    
+    </div>
     </>
   );
 };
