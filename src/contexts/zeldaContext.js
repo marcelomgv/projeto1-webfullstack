@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useCallback } from "react";
+import { createContext, useContext, useReducer, useCallback } from "react";
 
 const ZeldaContext = createContext();
 
@@ -9,6 +9,7 @@ const ActionTypes = {
   SET_PAGE: "SET_PAGE",
   SET_HAS_MORE_CHARACTERS: "SET_HAS_MORE_CHARACTERS",
   SET_GAME: "SET_GAME",
+  SET_ERROR: "SET_ERROR",
 };
 
 const initialState = {
@@ -18,6 +19,7 @@ const initialState = {
   page: 1,
   hasMoreCharacters: true,
   games: {},
+  error: null,
 };
 
 const zeldaReducer = (state, action) => {
@@ -29,12 +31,15 @@ const zeldaReducer = (state, action) => {
       };
 
     case ActionTypes.ADD_CHARACTERS:
-      const newCharacters = Array.isArray(action.payload) ? action.payload : [];
       return {
         ...state,
-        characters: state.page === 1
-          ? newCharacters
-          : [...state.characters, ...newCharacters],
+        characters: Array.isArray(action.payload) ? action.payload : [],
+      };
+
+    case ActionTypes.SET_HAS_MORE_CHARACTERS:
+      return {
+        ...state,
+        hasMoreCharacters: action.payload,
       };
 
     case ActionTypes.SET_CURRENT_CHARACTER:
@@ -49,12 +54,6 @@ const zeldaReducer = (state, action) => {
         page: action.payload,
       };
 
-    case ActionTypes.SET_HAS_MORE_CHARACTERS:
-      return {
-        ...state,
-        hasMoreCharacters: action.payload,
-      };
-
     case ActionTypes.SET_GAME:
       return {
         ...state,
@@ -62,6 +61,12 @@ const zeldaReducer = (state, action) => {
           ...state.games,
           [action.payload.id]: action.payload,
         },
+      };
+
+    case ActionTypes.SET_ERROR:
+      return {
+        ...state,
+        error: action.payload,
       };
 
     default:
@@ -72,27 +77,48 @@ const zeldaReducer = (state, action) => {
 export const ZeldaProvider = ({ children }) => {
   const [state, dispatch] = useReducer(zeldaReducer, initialState);
 
-  const listCharacters = useCallback((limit = 12) => {
+  const listCharacters = useCallback(async (name = "") => {
     dispatch({ type: ActionTypes.SET_LOADING, payload: true });
+    dispatch({ type: ActionTypes.SET_ERROR, payload: null });
 
-    fetch(`https://zelda.fanapis.com/api/characters`)
-      .then((response) => response.json())
-      .then((data) => {
+    const capitalizeWords = (str) =>
+      String(str).replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase());
+
+    const searchName = name ? capitalizeWords(name) : "";
+    let page = 1;
+    let allCharacters = [];
+
+    try {
+      while (true) {
+        const queryParams = new URLSearchParams();
+        queryParams.append("page", page);
+        if (searchName.trim()) {
+          queryParams.append("name", searchName.trim());
+        }
+
+        const response = await fetch(`https://zelda.fanapis.com/api/characters?${queryParams.toString()}`);
+
+        const data = await response.json();
+
         const characters = Array.isArray(data.data) ? data.data : [];
-        const hasMore = characters.length === limit;
+        if (characters.length === 0) break;
 
-        dispatch({ type: ActionTypes.ADD_CHARACTERS, payload: characters });
-        dispatch({ type: ActionTypes.SET_HAS_MORE_CHARACTERS, payload: hasMore });
-        dispatch({ type: ActionTypes.SET_LOADING, payload: false });
-      })
-      .catch((error) => {
-        console.error("Erro ao buscar personagens", error);
-        dispatch({ type: ActionTypes.SET_LOADING, payload: false });
-      });
+        allCharacters = [...allCharacters, ...characters];
+        page += 1;
+      }
+
+      dispatch({ type: ActionTypes.ADD_CHARACTERS, payload: allCharacters });
+      dispatch({ type: ActionTypes.SET_HAS_MORE_CHARACTERS, payload: false });
+    } catch (error) {
+      dispatch({ type: ActionTypes.SET_ERROR, payload: error.message || "Erro ao buscar personagens" });
+    } finally {
+      dispatch({ type: ActionTypes.SET_LOADING, payload: false });
+    }
   }, []);
 
   const getCharacterDetails = useCallback((id) => {
     dispatch({ type: ActionTypes.SET_LOADING, payload: true });
+    dispatch({ type: ActionTypes.SET_ERROR, payload: null });
 
     fetch(`https://zelda.fanapis.com/api/characters/${id}`)
       .then((response) => response.json())
@@ -102,10 +128,10 @@ export const ZeldaProvider = ({ children }) => {
         dispatch({ type: ActionTypes.SET_LOADING, payload: false });
       })
       .catch((error) => {
-        console.error("Erro ao buscar personagem", error);
+        dispatch({ type: ActionTypes.SET_ERROR, payload: error.message || "Erro ao buscar personagem" });
         dispatch({ type: ActionTypes.SET_LOADING, payload: false });
       });
-  }, [])
+  }, []);
 
   const getGameById = useCallback(async (id) => {
     if (state.games[id]) return;
@@ -117,10 +143,9 @@ export const ZeldaProvider = ({ children }) => {
         dispatch({ type: ActionTypes.SET_GAME, payload: data.data });
       }
     } catch (err) {
-      console.error("Erro ao buscar jogo:", err);
+      dispatch({ type: ActionTypes.SET_ERROR, payload: err.message || "Erro ao buscar jogo" });
     }
   }, [state.games]);
-
 
   return (
     <ZeldaContext.Provider
@@ -132,7 +157,8 @@ export const ZeldaProvider = ({ children }) => {
         listCharacters,
         getCharacterDetails,
         getGameById,
-      games: state.games,
+        games: state.games,
+        error: state.error,
         setPage: (page) => dispatch({ type: ActionTypes.SET_PAGE, payload: page }),
       }}
     >

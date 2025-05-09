@@ -1,20 +1,40 @@
-import { useEffect } from "react";
-import { Card, Col, Row, Spinner } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { Card, Col, Row, Spinner, Form, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useZelda } from "../contexts/zeldaContext";
 
 const Personagens = () => {
   const { characters, loading, listCharacters, hasMoreCharacters } = useZelda();
+  const [search, setSearch] = useState("");
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
-    if (characters.length === 0) {
-      listCharacters(1);
-    }
-  }, [characters.length, listCharacters]);
+    listCharacters(query);
+  }, [query, listCharacters]);
+
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setQuery(search.trim());
+  };
 
   return (
     <>
       <p className="titulo">Character Gallery</p>
+
+      <div className="search">
+        <Form onSubmit={handleSubmit} className="mb-4 d-flex" role="search">
+          <Form.Control
+            type="text"
+            placeholder="Search by name"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="me-2"
+          />
+          <Button type="submit" variant="primary">Search</Button>
+        </Form>
+      </div>
+
       <Row className="row">
         {characters.map((character) => (
           <Col md={4} key={character.id} className="mb-4">
@@ -36,13 +56,12 @@ const Personagens = () => {
 
       {loading && <Spinner animation="border" className="d-block mx-auto" />}
 
-      {!hasMoreCharacters && !loading && (
-        <div>
-          <p>Fim da lista.</p>
-        </div>
+      {!loading && characters.length === 0 && (
+        <p className="text-center">No characters found.</p>
       )}
+
     </>
   );
-}
+};
 
 export default Personagens;
