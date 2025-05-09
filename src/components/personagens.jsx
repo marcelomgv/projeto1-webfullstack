@@ -14,11 +14,11 @@ const Personagens = () => {
 
   return (
     <>
-      <p className="titulo">Galeria de Personagens</p>
+      <p className="titulo">Character Gallery</p>
       <Row className="row">
         {characters.map((character) => (
           <Col md={4} key={character.id} className="mb-4">
-            <Link to={`/personagem/${character.id}`} style={{ textDecoration: "none" }}>
+            <Link to={`/personagens/${character.id}`} style={{ textDecoration: "none" }}>
               <Card className="character-card">
                 <Card.Body className="card-body">
                   <Card.Title className="card-title">{character.name}</Card.Title>

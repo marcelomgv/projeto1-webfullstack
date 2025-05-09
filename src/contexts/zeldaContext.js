@@ -8,6 +8,7 @@ const ActionTypes = {
   SET_CURRENT_CHARACTER: "SET_CURRENT_CHARACTER",
   SET_PAGE: "SET_PAGE",
   SET_HAS_MORE_CHARACTERS: "SET_HAS_MORE_CHARACTERS",
+  SET_GAME: "SET_GAME",
 };
 
 const initialState = {
@@ -16,6 +17,7 @@ const initialState = {
   currentCharacter: null,
   page: 1,
   hasMoreCharacters: true,
+  games: {},
 };
 
 const zeldaReducer = (state, action) => {
@@ -51,6 +53,15 @@ const zeldaReducer = (state, action) => {
       return {
         ...state,
         hasMoreCharacters: action.payload,
+      };
+
+    case ActionTypes.SET_GAME:
+      return {
+        ...state,
+        games: {
+          ...state.games,
+          [action.payload.id]: action.payload,
+        },
       };
 
     default:
@@ -96,6 +107,21 @@ export const ZeldaProvider = ({ children }) => {
       });
   }, [])
 
+  const getGameById = useCallback(async (id) => {
+    if (state.games[id]) return;
+
+    try {
+      const res = await fetch(`https://zelda.fanapis.com/api/games/${id}`);
+      const data = await res.json();
+      if (data.data) {
+        dispatch({ type: ActionTypes.SET_GAME, payload: data.data });
+      }
+    } catch (err) {
+      console.error("Erro ao buscar jogo:", err);
+    }
+  }, [state.games]);
+
+
   return (
     <ZeldaContext.Provider
       value={{
@@ -105,6 +131,8 @@ export const ZeldaProvider = ({ children }) => {
         hasMoreCharacters: state.hasMoreCharacters,
         listCharacters,
         getCharacterDetails,
+        getGameById,
+      games: state.games,
         setPage: (page) => dispatch({ type: ActionTypes.SET_PAGE, payload: page }),
       }}
     >
