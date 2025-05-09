@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/projeto1-webfullstack/static/css/main.e64ccc83.css",
-    "main.js": "/projeto1-webfullstack/static/js/main.5dc3b47b.js",
-    "static/media/zelda.jpg": "/projeto1-webfullstack/static/media/zelda.fbe1c10c1224e7d71ec6.jpg",
-    "static/media/HyliaSerifBeta-Regular.otf": "/projeto1-webfullstack/static/media/HyliaSerifBeta-Regular.587194a6240d0f662864.otf",
-    "index.html": "/projeto1-webfullstack/index.html",
-    "main.e64ccc83.css.map": "/projeto1-webfullstack/static/css/main.e64ccc83.css.map",
-    "main.5dc3b47b.js.map": "/projeto1-webfullstack/static/js/main.5dc3b47b.js.map"
+    "main.css": "/static/css/main.de310e4f.css",
+    "main.js": "/static/js/main.5dc3b47b.js",
+    "static/media/zelda.jpg": "/static/media/zelda.fbe1c10c1224e7d71ec6.jpg",
+    "static/media/HyliaSerifBeta-Regular.otf": "/static/media/HyliaSerifBeta-Regular.587194a6240d0f662864.otf",
+    "index.html": "/index.html",
+    "main.de310e4f.css.map": "/static/css/main.de310e4f.css.map",
+    "main.5dc3b47b.js.map": "/static/js/main.5dc3b47b.js.map"
   },
   "entrypoints": [
-    "static/css/main.e64ccc83.css",
+    "static/css/main.de310e4f.css",
     "static/js/main.5dc3b47b.js"
   ]
 }
