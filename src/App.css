@@ -1,0 +1,60 @@
+@font-face {
+  font-family: 'HylianFont';
+  src: url('../public/fonts/HyliaSerifBeta-Regular.otf') format('otf');
+}
+
+*{
+  font-family: 'HylianFont';
+}
+
+.navbar{
+  display: flex;
+  justify-content: space-between;
+  background-color: rgb(185, 180, 180);
+  font-size: large;
+  padding: 1%;
+}
+
+.contNavBar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 98%;
+}
+
+.links {
+  display: flex;
+  gap: 15%;
+}
+
+.home {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-size: 1.5vw;
+  margin-top: 5%;
+}
+
+.descHome {
+  display: flex;
+  flex-direction: column;
+}
+
+h1, p {
+  display: flex;
+  justify-content: center;
+}
+
+.bttHome {
+  display: flex;
+  justify-content: center;
+  gap: 30%;
+  margin-top: 3%;
+}
+
+.btt {
+  font-size: 1.1vw;
+  border-radius: 5%;
+
+}
