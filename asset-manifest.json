@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/projeto1-webfullstack/static/css/main.e64ccc83.css",
-    "main.js": "/projeto1-webfullstack/static/js/main.5dc3b47b.js",
+    "main.js": "/projeto1-webfullstack/static/js/main.a6728f59.js",
     "static/media/zelda.jpg": "/projeto1-webfullstack/static/media/zelda.fbe1c10c1224e7d71ec6.jpg",
     "static/media/HyliaSerifBeta-Regular.otf": "/projeto1-webfullstack/static/media/HyliaSerifBeta-Regular.587194a6240d0f662864.otf",
     "index.html": "/projeto1-webfullstack/index.html",
     "main.e64ccc83.css.map": "/projeto1-webfullstack/static/css/main.e64ccc83.css.map",
-    "main.5dc3b47b.js.map": "/projeto1-webfullstack/static/js/main.5dc3b47b.js.map"
+    "main.a6728f59.js.map": "/projeto1-webfullstack/static/js/main.a6728f59.js.map"
   },
   "entrypoints": [
     "static/css/main.e64ccc83.css",
-    "static/js/main.5dc3b47b.js"
+    "static/js/main.a6728f59.js"
   ]
 }
