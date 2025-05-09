@@ -30,16 +30,16 @@ const zeldaReducer = (state, action) => {
         loading: action.payload,
       };
 
-    case ActionTypes.ADD_CHARACTERS:
-      return {
-        ...state,
-        characters: Array.isArray(action.payload) ? action.payload : [],
-      };
-
     case ActionTypes.SET_HAS_MORE_CHARACTERS:
       return {
         ...state,
         hasMoreCharacters: action.payload,
+      };
+
+    case ActionTypes.ADD_CHARACTERS:
+      return {
+        ...state,
+        characters: Array.isArray(action.payload) ? action.payload : [],
       };
 
     case ActionTypes.SET_CURRENT_CHARACTER:
@@ -80,20 +80,21 @@ export const ZeldaProvider = ({ children }) => {
   const listCharacters = useCallback(async (name = "") => {
     dispatch({ type: ActionTypes.SET_LOADING, payload: true });
     dispatch({ type: ActionTypes.SET_ERROR, payload: null });
+    dispatch({ type: ActionTypes.ADD_CHARACTERS, payload: [] });
 
     const capitalizeWords = (str) =>
       String(str).replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase());
 
     const searchName = name ? capitalizeWords(name) : "";
-    let page = 1;
+    const currentPage = state.page;
     let allCharacters = [];
 
     try {
       while (true) {
         const queryParams = new URLSearchParams();
-        queryParams.append("page", page);
+        queryParams.append("page", currentPage);
         if (searchName.trim()) {
-          queryParams.append("name", searchName.trim());
+          queryParams.append("name", name.trim());
         }
 
         const response = await fetch(`https://zelda.fanapis.com/api/characters?${queryParams.toString()}`);
@@ -104,17 +105,17 @@ export const ZeldaProvider = ({ children }) => {
         if (characters.length === 0) break;
 
         allCharacters = [...allCharacters, ...characters];
-        page += 1;
+        dispatch({ type: ActionTypes.ADD_CHARACTERS, payload: allCharacters });
       }
 
-      dispatch({ type: ActionTypes.ADD_CHARACTERS, payload: allCharacters });
       dispatch({ type: ActionTypes.SET_HAS_MORE_CHARACTERS, payload: false });
+      dispatch({ type: ActionTypes.SET_PAGE, payload: currentPage + 1 });
     } catch (error) {
       dispatch({ type: ActionTypes.SET_ERROR, payload: error.message || "Erro ao buscar personagens" });
     } finally {
       dispatch({ type: ActionTypes.SET_LOADING, payload: false });
     }
-  }, []);
+  }, [state.page]);
 
   const getCharacterDetails = useCallback((id) => {
     dispatch({ type: ActionTypes.SET_LOADING, payload: true });

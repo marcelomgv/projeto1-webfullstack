@@ -4,14 +4,13 @@ import { Link } from "react-router-dom";
 import { useZelda } from "../contexts/zeldaContext";
 
 const Personagens = () => {
-  const { characters, loading, listCharacters, hasMoreCharacters } = useZelda();
+  const { characters, loading, listCharacters } = useZelda();
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
 
   useEffect(() => {
-    listCharacters(query);
-  }, [query, listCharacters]);
-
+  listCharacters(query);
+}, [query, listCharacters]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
