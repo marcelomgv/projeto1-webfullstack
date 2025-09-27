@@ -85,37 +85,39 @@ export const ZeldaProvider = ({ children }) => {
     const capitalizeWords = (str) =>
       String(str).replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase());
 
-    const searchName = name ? capitalizeWords(name) : "";
-    const currentPage = state.page;
-    let allCharacters = [];
-
     try {
-      while (true) {
-        const queryParams = new URLSearchParams();
-        queryParams.append("page", currentPage);
-        if (searchName.trim()) {
-          queryParams.append("name", name.trim());
-        }
+      const searchName = capitalizeWords(name.trim());
 
-        const response = await fetch(`https://zelda.fanapis.com/api/characters?${queryParams.toString()}`);
-
-        const data = await response.json();
-
-        const characters = Array.isArray(data.data) ? data.data : [];
-        if (characters.length === 0) break;
-
-        allCharacters = [...allCharacters, ...characters];
-        dispatch({ type: ActionTypes.ADD_CHARACTERS, payload: allCharacters });
+      if (!searchName) {
+        dispatch({
+          type: ActionTypes.SET_ERROR,
+        });
+        dispatch({ type: ActionTypes.SET_LOADING, payload: false });
+        return;
       }
 
-      dispatch({ type: ActionTypes.SET_HAS_MORE_CHARACTERS, payload: false });
-      dispatch({ type: ActionTypes.SET_PAGE, payload: currentPage + 1 });
+      const response = await fetch(
+        `https://zelda.fanapis.com/api/characters?name=${encodeURIComponent(searchName)}`
+      );
+      const data = await response.json();
+
+      if (!data || !Array.isArray(data.data) || data.data.length === 0) {
+        dispatch({
+          type: ActionTypes.SET_ERROR,
+          payload: "No character found. Enter a name to search",
+        });
+      } else {
+        dispatch({ type: ActionTypes.ADD_CHARACTERS, payload: data.data });
+      }
     } catch (error) {
-      dispatch({ type: ActionTypes.SET_ERROR, payload: error.message || "Erro ao buscar personagens" });
+      dispatch({
+        type: ActionTypes.SET_ERROR,
+        payload: error.message || "Error when searching for characters",
+      });
     } finally {
       dispatch({ type: ActionTypes.SET_LOADING, payload: false });
     }
-  }, [state.page]);
+  }, []);
 
   const getCharacterDetails = useCallback((id) => {
     dispatch({ type: ActionTypes.SET_LOADING, payload: true });

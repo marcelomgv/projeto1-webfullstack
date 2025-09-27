@@ -56,7 +56,7 @@ const Personagens = () => {
       {loading && <Spinner animation="border" className="d-block mx-auto" />}
 
       {!loading && characters.length === 0 && (
-        <p className="text-center">No characters found.</p>
+        <p className="text-center">No character found. Enter a name to search</p>
       )}
 
     </>
