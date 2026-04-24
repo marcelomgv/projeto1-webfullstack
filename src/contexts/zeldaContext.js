@@ -91,6 +91,7 @@ export const ZeldaProvider = ({ children }) => {
       if (!searchName) {
         dispatch({
           type: ActionTypes.SET_ERROR,
+          payload: "Digite o nome do personagem para pesquisar.",
         });
         dispatch({ type: ActionTypes.SET_LOADING, payload: false });
         return;
@@ -101,10 +102,15 @@ export const ZeldaProvider = ({ children }) => {
       );
       const data = await response.json();
 
-      if (!data || !Array.isArray(data.data) || data.data.length === 0) {
+      if (!response.ok) {
         dispatch({
           type: ActionTypes.SET_ERROR,
-          payload: "No character found. Enter a name to search",
+          payload: "Erro ao consultar a API",
+        });
+      } else if (!data || !Array.isArray(data.data) || data.data.length === 0) {
+        dispatch({
+          type: ActionTypes.SET_ERROR,
+          payload: "Nenhum personagem encontrado",
         });
       } else {
         dispatch({ type: ActionTypes.ADD_CHARACTERS, payload: data.data });
@@ -112,7 +118,7 @@ export const ZeldaProvider = ({ children }) => {
     } catch (error) {
       dispatch({
         type: ActionTypes.SET_ERROR,
-        payload: error.message || "Error when searching for characters",
+        payload: error.message || "Erro ao buscar personagem",
       });
     } finally {
       dispatch({ type: ActionTypes.SET_LOADING, payload: false });
